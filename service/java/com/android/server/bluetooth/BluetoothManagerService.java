@@ -419,8 +419,14 @@ public class BluetoothManagerService extends IBluetoothManager.Stub {
                         mBluetoothLock.readLock().unlock();
                     }
                 } else if (st == BluetoothAdapter.STATE_ON) {
-                    sendDisableMsg(BluetoothProtoEnums.ENABLE_DISABLE_REASON_AIRPLANE_MODE,
-                            mContext.getPackageName());
+                    String airplaneModeRadios =
+                            Settings.Global.getString(mContentResolver,
+                            Settings.Global.AIRPLANE_MODE_RADIOS);
+                    if (airplaneModeRadios != null &&
+                            airplaneModeRadios.contains(Settings.Global.RADIO_BLUETOOTH)) {
+                        sendDisableMsg(BluetoothProtoEnums.ENABLE_DISABLE_REASON_AIRPLANE_MODE,
+                                mContext.getPackageName());
+                    }
                 }
             } else if (mEnableExternal) {
                 sendEnableMsg(mQuietEnableExternal,
@@ -595,13 +601,8 @@ public class BluetoothManagerService extends IBluetoothManager.Stub {
             mEnableExternal = true;
         }
 
-        String airplaneModeRadios =
-                Settings.Global.getString(mContentResolver, Settings.Global.AIRPLANE_MODE_RADIOS);
-        if (airplaneModeRadios == null || airplaneModeRadios.contains(
-                Settings.Global.RADIO_BLUETOOTH)) {
-            mBluetoothAirplaneModeListener = new BluetoothAirplaneModeListener(
-                    this, mBluetoothHandlerThread.getLooper(), context);
-        }
+        mBluetoothAirplaneModeListener = new BluetoothAirplaneModeListener(
+                this, mBluetoothHandlerThread.getLooper(), context);
 
         int systemUiUid = -1;
         // Check if device is configured with no home screen, which implies no SystemUI.
