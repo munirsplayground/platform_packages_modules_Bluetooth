@@ -646,14 +646,9 @@ public class BluetoothManagerService extends IBluetoothManager.Stub {
             mEnableExternal = true;
         }
 
-        String airplaneModeRadios =
-                Settings.Global.getString(mContentResolver, Settings.Global.AIRPLANE_MODE_RADIOS);
-        if (airplaneModeRadios == null || airplaneModeRadios.contains(
-                Settings.Global.RADIO_BLUETOOTH)) {
-            mBluetoothAirplaneModeListener = new BluetoothAirplaneModeListener(
-                    this, mBluetoothHandlerThread.getLooper(), context,
-                    mBluetoothNotificationManager);
-        }
+        mBluetoothAirplaneModeListener = new BluetoothAirplaneModeListener(
+                this, mBluetoothHandlerThread.getLooper(), context,
+                mBluetoothNotificationManager);
 
         int systemUiUid = -1;
         // Check if device is configured with no home screen, which implies no SystemUI.
